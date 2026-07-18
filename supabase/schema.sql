@@ -58,6 +58,13 @@ create index if not exists idx_history_product on inventory_history (product_id)
 create index if not exists idx_history_created on inventory_history (created_at desc);
 create index if not exists idx_expenses_date on expenses (date desc);
 
+-- Table privileges — newer Supabase projects don't grant these to anon by
+-- default, so RLS policies alone are not enough.
+grant usage on schema public to anon, authenticated;
+grant all on all tables in schema public to anon, authenticated;
+alter default privileges in schema public
+  grant all on tables to anon, authenticated;
+
 -- Row Level Security. Auth is not wired up yet, so these policies allow the
 -- anon role full access. When you enable Supabase Auth, replace `true` with
 -- an auth check such as `auth.uid() is not null`.
