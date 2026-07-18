@@ -72,6 +72,18 @@ export function DashboardPage() {
               icon={Banknote}
               tone="positive"
               sub="All-time sales"
+              info={
+                <>
+                  Total money earned from all recorded sales.
+                  <br />
+                  <span className="font-semibold">
+                    Revenue = Σ units sold × selling price
+                  </span>
+                  <br />
+                  Every time stock goes down as a sale, that sale is logged at
+                  the product&apos;s selling price at the time.
+                </>
+              }
             />
             <KpiCard
               index={1}
@@ -80,6 +92,18 @@ export function DashboardPage() {
               icon={TrendingUp}
               tone="positive"
               sub="Revenue − cost of goods"
+              info={
+                <>
+                  What you make on sales before expenses.
+                  <br />
+                  <span className="font-semibold">
+                    Gross Profit = Revenue − Cost of Goods Sold
+                  </span>
+                  <br />
+                  where COGS = units sold × cost price. Example: sell 2 items
+                  at ₹100 that cost ₹70 to make → (2×100) − (2×70) = ₹60.
+                </>
+              }
             />
             <KpiCard
               index={2}
@@ -88,6 +112,18 @@ export function DashboardPage() {
               icon={PiggyBank}
               tone={data.netProfit >= 0 ? "positive" : "negative"}
               sub="After expenses"
+              info={
+                <>
+                  What your business actually keeps.
+                  <br />
+                  <span className="font-semibold">
+                    Net Profit = Gross Profit − Total Expenses
+                  </span>
+                  <br />
+                  Expenses include yarn, packaging, fees — everything on the
+                  Expenses page.
+                </>
+              }
             />
             <KpiCard
               index={3}
@@ -115,6 +151,14 @@ export function DashboardPage() {
               icon={TriangleAlert}
               tone={data.lowStockCount > 0 ? "warning" : "default"}
               sub={data.lowStockCount > 0 ? "Needs attention" : "All healthy"}
+              info={
+                <>
+                  Products that need restocking soon: anything at or below its
+                  minimum stock level, including items that are fully out of
+                  stock. Set each product&apos;s minimum in the Inventory
+                  table&apos;s “Min” column.
+                </>
+              }
             />
             <KpiCard
               index={7}

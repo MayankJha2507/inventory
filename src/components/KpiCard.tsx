@@ -1,6 +1,11 @@
 import { motion } from "framer-motion";
-import type { LucideIcon } from "lucide-react";
+import { Info, type LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface KpiCardProps {
@@ -10,6 +15,8 @@ interface KpiCardProps {
   index?: number;
   tone?: "default" | "positive" | "negative" | "warning";
   sub?: string;
+  /** Optional explanation shown in a tooltip behind an info icon. */
+  info?: React.ReactNode;
 }
 
 const TONE_CLASS = {
@@ -33,6 +40,7 @@ export function KpiCard({
   index = 0,
   tone = "default",
   sub,
+  info,
 }: KpiCardProps) {
   return (
     <motion.div
@@ -43,7 +51,25 @@ export function KpiCard({
       <Card className="p-5 hover:shadow-card-hover">
         <div className="flex items-start justify-between">
           <div className="min-w-0">
-            <p className="text-xs font-medium text-muted-foreground">{title}</p>
+            <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              {title}
+              {info && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className="rounded-full text-subtle/70 transition-colors hover:text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                      aria-label={`What does ${title} mean?`}
+                    >
+                      <Info className="size-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[280px] leading-relaxed">
+                    {info}
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </p>
             <p
               className={cn(
                 "mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums",
