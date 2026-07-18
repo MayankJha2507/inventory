@@ -29,7 +29,7 @@ import {
 import { formatCurrency, formatRelativeTime } from "@/lib/format";
 import { useCurrency } from "@/features/settings/hooks";
 import { useUpdateProduct } from "../hooks";
-import { EditableCell } from "./EditableCell";
+import { EditableCell } from "@/components/EditableCell";
 import { StatusBadge } from "./StatusBadge";
 import { CategoryCell } from "./CategoryCell";
 import { Input } from "@/components/ui/input";
