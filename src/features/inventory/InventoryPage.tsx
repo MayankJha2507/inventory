@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
+import { focusSearchInput, useHotkey } from "@/lib/useHotkey";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +16,9 @@ export function InventoryPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+
+  useHotkey("/", focusSearchInput);
+  useHotkey("n", () => setAddOpen(true));
 
   const selectedProduct = useMemo(
     () => products.data?.find((p) => p.id === selectedId) ?? null,

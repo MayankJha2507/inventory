@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import type { Category } from "@/types";
+import { useSettings } from "@/features/settings/hooks";
 import { useCreateProduct } from "../hooks";
 import {
   Dialog,
@@ -42,7 +43,19 @@ export function AddProductDialog({
   onOpenChange,
 }: AddProductDialogProps) {
   const createProduct = useCreateProduct();
+  const { data: settings } = useSettings();
   const [form, setForm] = useState(EMPTY);
+
+  // Suggest the configured low-stock threshold as the default minimum.
+  useEffect(() => {
+    if (open && settings) {
+      setForm((f) =>
+        f === EMPTY
+          ? { ...EMPTY, min_stock: String(settings.low_stock_threshold) }
+          : f,
+      );
+    }
+  }, [open, settings]);
   const set = (key: keyof typeof EMPTY, value: string | null) =>
     setForm((f) => ({ ...f, [key]: value }));
 

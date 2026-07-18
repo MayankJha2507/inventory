@@ -145,3 +145,29 @@ export function useDeleteProduct() {
     },
   });
 }
+
+export function useCreateCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ name, color }: { name: string; color: string }) =>
+      (await getAdapter()).createCategory(name, color),
+    onSuccess: (category) => {
+      queryClient.invalidateQueries({ queryKey: qk.categories });
+      toast.success(`Category “${category.name}” added`);
+    },
+    onError: () => toast.error("Couldn't add category"),
+  });
+}
+
+export function useDeleteCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => (await getAdapter()).deleteCategory(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: qk.categories });
+      queryClient.invalidateQueries({ queryKey: qk.products });
+      toast.success("Category deleted");
+    },
+    onError: () => toast.error("Couldn't delete category"),
+  });
+}

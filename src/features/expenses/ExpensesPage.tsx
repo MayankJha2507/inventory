@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Calendar, Plus, Receipt, TrendingDown } from "lucide-react";
+import { focusSearchInput, useHotkey } from "@/lib/useHotkey";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +16,9 @@ export function ExpensesPage() {
   const currency = useCurrency();
   const expenses = useExpenses();
   const [addOpen, setAddOpen] = useState(false);
+
+  useHotkey("/", focusSearchInput);
+  useHotkey("n", () => setAddOpen(true));
 
   const stats = useMemo(() => {
     const data = expenses.data ?? [];

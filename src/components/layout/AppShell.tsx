@@ -1,9 +1,27 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { SidebarContent } from "./Sidebar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+
+function PageFallback() {
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="mt-2 h-4 w-72" />
+      </div>
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-[104px] rounded-2xl" />
+        ))}
+      </div>
+      <Skeleton className="h-80 rounded-2xl" />
+    </div>
+  );
+}
 
 export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -73,7 +91,9 @@ export function AppShell() {
             transition={{ duration: 0.18 }}
             className="mx-auto w-full max-w-[1200px] px-4 py-6 sm:px-6 lg:px-10 lg:py-10"
           >
-            <Outlet />
+            <Suspense fallback={<PageFallback />}>
+              <Outlet />
+            </Suspense>
           </motion.div>
         </AnimatePresence>
       </main>

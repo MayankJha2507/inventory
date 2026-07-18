@@ -1,32 +1,77 @@
-# React + TypeScript + Vite
+# Loopstitch — Crochet Inventory Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A polished, Linear/Notion-inspired inventory app for a handmade crochet
+business. Light theme, emerald accents, inline-editable tables, live
+dashboard, analytics and expense tracking.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+React · Vite · TypeScript · TailwindCSS v4 · shadcn-style UI · TanStack Table
+· TanStack Query · React Router · Recharts · Framer Motion · Lucide ·
+Supabase (optional)
 
-## React Compiler
+## Getting started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+The app works out of the box with **no backend**: a local adapter stores data
+in `localStorage`, seeded with a year of realistic demo data (products, sales
+history, expenses). Clear the `loopstitch:db:v1` key to reset.
+
+## Connecting Supabase (optional)
+
+1. Create a project at [supabase.com](https://supabase.com).
+2. Open the SQL editor and run [`supabase/schema.sql`](supabase/schema.sql).
+3. Copy `.env.example` to `.env` and fill in:
+   ```
+   VITE_SUPABASE_URL=https://<project>.supabase.co
+   VITE_SUPABASE_ANON_KEY=<anon key>
+   ```
+4. Restart the dev server — the app switches to the Supabase adapter
+   automatically (check Settings → Data & Integrations).
+
+Auth is not enabled yet; the RLS policies in `schema.sql` allow anon access
+and include comments showing how to lock them down once Supabase Auth is
+wired up.
+
+## Deploying to Netlify
+
+The repo includes `netlify.toml` (build command, `dist` publish dir, SPA
+redirect). Connect the GitHub repo in Netlify and deploy — optionally add the
+two `VITE_SUPABASE_*` environment variables in Site settings.
+
+## How the numbers work
+
+- **Inventory value** = cost price × current stock
+- **Profit per unit** = selling price − cost price
+- **Revenue / gross profit** come from the `inventory_history` log: lowering
+  stock records a *sale* (at the current selling price), raising it records a
+  *restock*. Saving from the product drawer logs an *adjustment* instead, and
+  the drawer's quick-stock buttons record explicit sales/restocks.
+- **Net profit** = gross profit − total expenses.
+- Status: **Out of stock** (0), **Low stock** (≤ minimum), **Healthy**.
+
+## Keyboard shortcuts
+
+- `/` — focus search (Inventory, Expenses)
+- `n` — new product / expense
+- `Enter` / `Esc` — commit / cancel an inline cell edit
+
+## Structure
+
+```
+src/
+  components/       shared UI (shadcn-style primitives, charts, cells)
+  data/             storage adapters: local (seeded) + Supabase, query keys
+  features/
+    dashboard/      KPI cards + charts, all derived from live data
+    inventory/      editable table, product drawer, add dialog, hooks
+    analytics/      time-range analytics with historical stock reconstruction
+    expenses/       editable expense table + stats
+    settings/       business prefs, categories, integrations
+  lib/              formatting, inventory math, supabase client, hotkeys
+supabase/schema.sql  database schema + RLS
+```
