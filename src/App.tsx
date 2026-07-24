@@ -1,10 +1,11 @@
-import { lazy } from "react";
+import { lazy, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppShell } from "@/components/layout/AppShell";
 import { ThemeProvider, useTheme } from "@/lib/theme";
+import { useSettings } from "@/features/settings/hooks";
 
 const DashboardPage = lazy(() =>
   import("@/features/dashboard/DashboardPage").then((m) => ({ default: m.DashboardPage })),
@@ -33,6 +34,16 @@ const queryClient = new QueryClient({
   },
 });
 
+/** Keeps the browser tab title in sync with the configured business name. */
+function DocumentTitle() {
+  const { data } = useSettings();
+  const businessName = data?.business_name?.trim();
+  useEffect(() => {
+    document.title = `${businessName || "Loopstitch"} — Inventory`;
+  }, [businessName]);
+  return null;
+}
+
 function ThemedToaster() {
   const { resolved } = useTheme();
   return (
@@ -57,6 +68,7 @@ export default function App() {
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider delayDuration={200}>
+          <DocumentTitle />
           <BrowserRouter>
             <Routes>
               <Route element={<AppShell />}>
