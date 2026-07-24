@@ -28,7 +28,7 @@ import {
 } from "@/lib/inventory";
 import { formatCurrency, formatRelativeTime } from "@/lib/format";
 import { useCurrency } from "@/features/settings/hooks";
-import { useUpdateProduct } from "../hooks";
+import { useHistory, useUpdateProduct } from "../hooks";
 import { EditableCell } from "@/components/EditableCell";
 import { StatusBadge } from "./StatusBadge";
 import { CategoryCell } from "./CategoryCell";
@@ -59,10 +59,26 @@ export function InventoryTable({
 }: InventoryTableProps) {
   const currency = useCurrency();
   const updateProduct = useUpdateProduct();
+  const history = useHistory();
 
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
+
+  // All-time units sold per product, summed from "sale" history entries.
+  // Refetched whenever stock changes, so this column stays in sync.
+  const unitsSoldByProduct = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const entry of history.data ?? []) {
+      if (entry.type === "sale") {
+        map.set(
+          entry.product_id,
+          (map.get(entry.product_id) ?? 0) + Math.abs(entry.quantity_change),
+        );
+      }
+    }
+    return map;
+  }, [history.data]);
 
   const money = (v: string | number) => formatCurrency(Number(v), currency);
 
@@ -105,7 +121,7 @@ export function InventoryTable({
         ),
       }),
       columnHelper.accessor("cost_price", {
-        header: "Cost",
+        header: "Cost Price",
         cell: (info) => (
           <EditableCell
             type="number"
@@ -117,7 +133,7 @@ export function InventoryTable({
         ),
       }),
       columnHelper.accessor("selling_price", {
-        header: "Price",
+        header: "Selling Price",
         cell: (info) => (
           <EditableCell
             type="number"
@@ -144,17 +160,22 @@ export function InventoryTable({
           />
         ),
       }),
-      columnHelper.accessor("min_stock", {
-        header: "Min",
-        cell: (info) => (
-          <EditableCell
-            type="number"
-            step={1}
-            align="right"
-            value={info.getValue()}
-            onSave={(v) => save(info.row.original.id, { min_stock: Number(v) })}
-          />
-        ),
+      columnHelper.accessor((row) => unitsSoldByProduct.get(row.id) ?? 0, {
+        id: "units_sold",
+        header: "Units Sold",
+        cell: (info) => {
+          const sold = info.getValue();
+          return (
+            <span
+              className={cn(
+                "block px-2 text-right text-sm tabular-nums",
+                sold > 0 ? "font-medium text-foreground" : "text-subtle",
+              )}
+            >
+              {sold}
+            </span>
+          );
+        },
       }),
       columnHelper.accessor((row) => getInventoryValue(row), {
         id: "inventory_value",
@@ -202,7 +223,7 @@ export function InventoryTable({
       }),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [categories, currency],
+    [categories, currency, unitsSoldByProduct],
   );
 
   const table = useReactTable({
@@ -304,7 +325,7 @@ export function InventoryTable({
       {/* Table */}
       <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
         <div className="max-h-[62vh] overflow-auto">
-          <table className="w-full min-w-[980px] border-separate border-spacing-0 text-sm">
+          <table className="w-full min-w-[1080px] border-separate border-spacing-0 text-sm">
             <thead>
               <tr>
                 {table.getFlatHeaders().map((header, i) => (
