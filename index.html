@@ -10,6 +10,21 @@
     <title>Loopstitch — Crochet Inventory</title>
     <link rel="preconnect" href="https://rsms.me/" />
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <script>
+      // Apply the saved theme before first paint to avoid a flash.
+      (function () {
+        try {
+          var pref = localStorage.getItem("loopstitch:theme") || "light";
+          var dark =
+            pref === "dark" ||
+            (pref === "system" &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.dataset.theme = dark ? "dark" : "light";
+        } catch (e) {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppShell } from "@/components/layout/AppShell";
+import { ThemeProvider, useTheme } from "@/lib/theme";
 
 const DashboardPage = lazy(() =>
   import("@/features/dashboard/DashboardPage").then((m) => ({ default: m.DashboardPage })),
@@ -32,33 +33,45 @@ const queryClient = new QueryClient({
   },
 });
 
+function ThemedToaster() {
+  const { resolved } = useTheme();
+  return (
+    <Toaster
+      position="bottom-right"
+      theme={resolved}
+      toastOptions={{
+        style: {
+          borderRadius: "0.875rem",
+          border: "1px solid var(--color-border)",
+          background: "var(--color-surface)",
+          color: "var(--color-foreground)",
+          boxShadow: "var(--shadow-pop)",
+        },
+      }}
+    />
+  );
+}
+
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider delayDuration={200}>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<AppShell />}>
-              <Route index element={<DashboardPage />} />
-              <Route path="inventory" element={<InventoryPage />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
-              <Route path="expenses" element={<ExpensesPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-        <Toaster
-          position="bottom-right"
-          toastOptions={{
-            style: {
-              borderRadius: "0.875rem",
-              border: "1px solid #e8eaee",
-              boxShadow: "0 4px 12px rgb(15 23 42 / 0.06), 0 12px 32px rgb(15 23 42 / 0.1)",
-            },
-          }}
-        />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider delayDuration={200}>
+          <BrowserRouter>
+            <Routes>
+              <Route element={<AppShell />}>
+                <Route index element={<DashboardPage />} />
+                <Route path="inventory" element={<InventoryPage />} />
+                <Route path="analytics" element={<AnalyticsPage />} />
+                <Route path="expenses" element={<ExpensesPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+          <ThemedToaster />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

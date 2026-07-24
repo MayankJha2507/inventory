@@ -244,7 +244,7 @@ export function ExpensesTable({ expenses }: { expenses: Expense[] }) {
                   <th
                     key={header.id}
                     className={cn(
-                      "sticky top-0 z-10 whitespace-nowrap border-b border-border bg-slate-50/95 px-3 py-2.5 text-left text-xs font-medium text-muted-foreground backdrop-blur first:pl-4 last:pr-4",
+                      "sticky top-0 z-10 whitespace-nowrap border-b border-border bg-muted/95 px-3 py-2.5 text-left text-xs font-medium text-muted-foreground backdrop-blur first:pl-4 last:pr-4",
                       header.column.getCanSort() && "cursor-pointer select-none",
                     )}
                     onClick={header.column.getToggleSortingHandler()}

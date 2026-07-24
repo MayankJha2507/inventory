@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Enable class/attribute-based dark mode driven by the ThemeProvider, which
+   sets data-theme="light" | "dark" on <html>. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
@@ -56,6 +60,47 @@
   }
 }
 
+/* Chart chrome colors — referenced directly via var() in Recharts props. */
+:root {
+  --chart-grid: #eef0f3;
+  --chart-cursor: #cbd5e1;
+  --chart-cursor-fill: #f1f5f9;
+  --selection: #d1fae5;
+  --scrollbar-thumb: #d7dbe2;
+}
+
+/* ---- Dark theme ---- */
+:root[data-theme="dark"] {
+  --color-background: #0a0c10;
+  --color-surface: #14181f;
+  --color-foreground: #e7ebf0;
+  --color-muted: #1c222c;
+  --color-muted-foreground: #8b95a5;
+  --color-subtle: #5f6a7a;
+  --color-border: #242a35;
+  --color-ring: #10b981;
+
+  --color-primary: #10b981;
+  --color-primary-hover: #34d399;
+  --color-primary-soft: #10261e;
+
+  --color-danger: #f87171;
+  --color-danger-soft: #2a1618;
+  --color-warning: #fbbf24;
+  --color-warning-soft: #2a2210;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 1px 3px rgb(0 0 0 / 0.3);
+  --shadow-card-hover: 0 2px 4px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.5);
+  --shadow-drawer: 0 0 0 1px rgb(0 0 0 / 0.5), 0 24px 64px rgb(0 0 0 / 0.6);
+  --shadow-pop: 0 4px 12px rgb(0 0 0 / 0.4), 0 12px 32px rgb(0 0 0 / 0.55);
+
+  --chart-grid: #232a35;
+  --chart-cursor: #3a4353;
+  --chart-cursor-fill: #1c222c;
+  --selection: #10382a;
+  --scrollbar-thumb: #2c333f;
+}
+
 html {
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
@@ -66,21 +111,27 @@ body {
   @apply bg-background text-foreground;
 }
 
+/* Smoothly cross-fade the whole app when the theme flips. */
+:root[data-theme] body,
+:root[data-theme] body * {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
 ::selection {
-  background: #d1fae5;
+  background: var(--selection);
 }
 
 /* Thin, unobtrusive scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d7dbe2 transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #d7dbe2;
+  background: var(--scrollbar-thumb);
   border-radius: 8px;
 }
 *::-webkit-scrollbar-track {

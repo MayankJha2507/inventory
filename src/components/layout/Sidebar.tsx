@@ -65,7 +65,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 {isActive && (
                   <motion.span
                     layoutId="sidebar-active"
-                    className="absolute inset-0 rounded-xl bg-white shadow-card ring-1 ring-border"
+                    className="absolute inset-0 rounded-xl bg-surface shadow-card ring-1 ring-border"
                     transition={{ type: "spring", stiffness: 420, damping: 34 }}
                   />
                 )}

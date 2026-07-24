@@ -16,9 +16,9 @@ const TYPE_META: Record<
   { label: string; icon: LucideIcon; className: string }
 > = {
   sale: { label: "Sale", icon: ArrowDownRight, className: "bg-primary-soft text-primary" },
-  restock: { label: "Restock", icon: ArrowUpRight, className: "bg-sky-50 text-sky-500" },
+  restock: { label: "Restock", icon: ArrowUpRight, className: "bg-sky-50 text-sky-500 dark:bg-sky-500/10 dark:text-sky-400" },
   adjustment: { label: "Adjusted", icon: SlidersHorizontal, className: "bg-muted text-muted-foreground" },
-  created: { label: "Added", icon: PackagePlus, className: "bg-violet-50 text-violet-500" },
+  created: { label: "Added", icon: PackagePlus, className: "bg-violet-50 text-violet-500 dark:bg-violet-500/10 dark:text-violet-400" },
 };
 
 export function RecentChangesList({

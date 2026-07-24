@@ -12,7 +12,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { AXIS_STYLE, ChartTooltip, GRID_STROKE } from "@/components/charts";
+import {
+  AXIS_STYLE,
+  ChartTooltip,
+  CURSOR_FILL,
+  CURSOR_LINE,
+  GRID_STROKE,
+} from "@/components/charts";
 import { formatCompactCurrency, formatCurrency } from "@/lib/format";
 import { useCurrency } from "@/features/settings/hooks";
 import type { CategoryPerf, TimePoint } from "../useAnalyticsData";
@@ -47,7 +53,7 @@ export function RevenueProfitChart({ data }: { data: TimePoint[] }) {
           />
           <Tooltip
             content={<ChartTooltip format={(v) => formatCurrency(v, currency)} />}
-            cursor={{ stroke: "#cbd5e1", strokeDasharray: "3 3" }}
+            cursor={CURSOR_LINE}
           />
           <Area
             type="monotone"
@@ -96,7 +102,7 @@ export function InventoryGrowthChart({ data }: { data: TimePoint[] }) {
           <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} width={36} />
           <Tooltip
             content={<ChartTooltip format={(v) => `${v} units`} />}
-            cursor={{ stroke: "#cbd5e1", strokeDasharray: "3 3" }}
+            cursor={CURSOR_LINE}
           />
           <Area
             type="monotone"
@@ -136,7 +142,7 @@ export function LowStockTrendChart({ data }: { data: TimePoint[] }) {
           />
           <Tooltip
             content={<ChartTooltip format={(v) => `${v} products`} />}
-            cursor={{ stroke: "#cbd5e1", strokeDasharray: "3 3" }}
+            cursor={CURSOR_LINE}
           />
           <Line
             type="stepAfter"
@@ -178,7 +184,7 @@ export function CategoryPerformanceChart({ data }: { data: CategoryPerf[] }) {
           />
           <Tooltip
             content={<ChartTooltip format={(v) => formatCurrency(v, currency)} />}
-            cursor={{ fill: "#f1f5f9" }}
+            cursor={CURSOR_FILL}
           />
           <Bar
             dataKey="revenue"

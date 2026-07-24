@@ -9,10 +9,17 @@ export const CHART_PALETTE = [
 
 export const AXIS_STYLE = {
   fontSize: 11,
-  fill: "#94a3b8",
+  fill: "var(--color-muted-foreground)",
 } as const;
 
-export const GRID_STROKE = "#eef0f3";
+export const GRID_STROKE = "var(--chart-grid)";
+
+/** Recharts cursor styles that adapt to the active theme. */
+export const CURSOR_LINE = {
+  stroke: "var(--chart-cursor)",
+  strokeDasharray: "3 3",
+} as const;
+export const CURSOR_FILL = { fill: "var(--chart-cursor-fill)" } as const;
 
 interface TooltipEntry {
   dataKey?: string | number;

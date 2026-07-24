@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Cloud, CloudOff, Palette, Plus, Store, Trash2 } from "lucide-react";
+import { Cloud, CloudOff, Monitor, Moon, Plus, Store, Sun, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/layout/PageHeader";
 import {
@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -24,7 +23,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { isSupabaseEnabled } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
+import { useTheme, type ThemePreference } from "@/lib/theme";
 import { CHART_PALETTE } from "@/components/charts";
+
+const THEME_OPTIONS: Array<{
+  value: ThemePreference;
+  label: string;
+  icon: typeof Sun;
+}> = [
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
+  { value: "system", label: "System", icon: Monitor },
+];
 import {
   useCategories,
   useCreateCategory,
@@ -77,6 +88,7 @@ export function SettingsPage() {
   const products = useProducts();
   const createCategory = useCreateCategory();
   const deleteCategory = useDeleteCategory();
+  const { preference, resolved, setPreference } = useTheme();
 
   const [businessName, setBusinessName] = useState("");
   const [threshold, setThreshold] = useState("");
@@ -270,26 +282,36 @@ export function SettingsPage() {
 
         <SectionCard
           title="Appearance"
-          description="Theme preferences"
+          description="Choose how Loopstitch looks on this device"
           delay={0.1}
         >
-          <div className="flex items-center justify-between rounded-xl border border-border px-4 py-3">
-            <div className="flex items-center gap-3">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-muted">
-                <Palette className="size-4 text-muted-foreground" />
-              </span>
-              <div>
-                <p className="text-sm font-medium">Light theme</p>
-                <p className="text-[11px] text-subtle">
-                  Dark mode is on the roadmap
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline">Coming soon</Badge>
-              <Switch checked={false} disabled aria-label="Dark mode (coming soon)" />
-            </div>
+          <div className="grid grid-cols-3 gap-2">
+            {THEME_OPTIONS.map((option) => {
+              const active = preference === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setPreference(option.value)}
+                  aria-pressed={active}
+                  className={cn(
+                    "flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-xs font-medium transition-colors",
+                    active
+                      ? "border-primary/60 bg-primary-soft text-primary-hover ring-1 ring-primary/30"
+                      : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                  )}
+                >
+                  <option.icon className="size-5" />
+                  {option.label}
+                </button>
+              );
+            })}
           </div>
+          <p className="text-[11px] text-subtle">
+            {preference === "system"
+              ? `Following your device settings — currently ${resolved}.`
+              : `Using the ${preference} theme on this device.`}
+          </p>
         </SectionCard>
 
         <SectionCard

@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { AXIS_STYLE, ChartTooltip, GRID_STROKE } from "@/components/charts";
+import { AXIS_STYLE, ChartTooltip, CURSOR_FILL, GRID_STROKE } from "@/components/charts";
 import { formatCompactCurrency, formatCurrency } from "@/lib/format";
 import { useCurrency } from "@/features/settings/hooks";
 import type { NamedValue } from "../useDashboardData";
@@ -41,7 +41,7 @@ export function CategoryValueChart({ data }: { data: NamedValue[] }) {
           />
           <Tooltip
             content={<ChartTooltip format={(v) => formatCurrency(v, currency)} />}
-            cursor={{ fill: "#f1f5f9" }}
+            cursor={CURSOR_FILL}
           />
           <Bar
             dataKey="value"

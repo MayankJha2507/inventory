@@ -23,14 +23,14 @@ const TONE_CLASS = {
   default: "text-foreground",
   positive: "text-primary-hover",
   negative: "text-danger",
-  warning: "text-amber-600",
+  warning: "text-amber-600 dark:text-amber-400",
 };
 
 const ICON_BG = {
   default: "bg-muted text-muted-foreground",
   positive: "bg-primary-soft text-primary",
   negative: "bg-danger-soft text-danger",
-  warning: "bg-warning-soft text-amber-500",
+  warning: "bg-warning-soft text-amber-500 dark:text-amber-400",
 };
 
 export function KpiCard({

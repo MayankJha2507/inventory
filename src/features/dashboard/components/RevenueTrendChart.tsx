@@ -7,7 +7,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { AXIS_STYLE, ChartTooltip, GRID_STROKE } from "@/components/charts";
+import { AXIS_STYLE, ChartTooltip, CURSOR_LINE, GRID_STROKE } from "@/components/charts";
 import { formatCompactCurrency, formatCurrency } from "@/lib/format";
 import { useCurrency } from "@/features/settings/hooks";
 import type { MonthPoint } from "../useDashboardData";
@@ -47,7 +47,7 @@ export function RevenueTrendChart({ data }: { data: MonthPoint[] }) {
             content={
               <ChartTooltip format={(v) => formatCurrency(v, currency)} />
             }
-            cursor={{ stroke: "#cbd5e1", strokeDasharray: "3 3" }}
+            cursor={CURSOR_LINE}
           />
           <Area
             type="monotone"

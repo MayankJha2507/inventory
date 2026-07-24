@@ -52,7 +52,7 @@ export function AppShell() {
         {mobileOpen && (
           <>
             <motion.div
-              className="fixed inset-0 z-40 bg-slate-900/25 lg:hidden"
+              className="fixed inset-0 z-40 bg-slate-900/25 dark:bg-black/55 lg:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

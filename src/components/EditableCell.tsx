@@ -78,7 +78,7 @@ export function EditableCell({
         }}
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          "h-7 w-full min-w-0 rounded-lg border border-primary/50 bg-white px-2 text-sm outline-none ring-2 ring-ring/25",
+          "h-7 w-full min-w-0 rounded-lg border border-primary/50 bg-surface px-2 text-sm outline-none ring-2 ring-ring/25",
           align === "right" && "text-right",
         )}
       />
