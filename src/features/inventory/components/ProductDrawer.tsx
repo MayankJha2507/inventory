@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { ImageIcon, Minus, Plus, Trash2 } from "lucide-react";
+import { ImageIcon, ShoppingCart, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import type { Category, Product } from "@/types";
+import { ADJUSTMENT_REASONS, type Category, type HistoryType, type Product } from "@/types";
 import {
   getInventoryValue,
   getProfitPerUnit,
@@ -76,9 +76,17 @@ export function ProductDrawer({
   const deleteProduct = useDeleteProduct();
   const [draft, setDraft] = useState<DraftState | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [saleQty, setSaleQty] = useState("1");
+  const [adjustReason, setAdjustReason] = useState<HistoryType>("restock");
+  const [adjustAmount, setAdjustAmount] = useState("");
 
   useEffect(() => {
-    if (open && product) setDraft(toDraft(product));
+    if (open && product) {
+      setDraft(toDraft(product));
+      setSaleQty("1");
+      setAdjustReason("restock");
+      setAdjustAmount("");
+    }
   }, [open, product?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!product) return null;
@@ -116,15 +124,61 @@ export function ProductDrawer({
     onOpenChange(false);
   };
 
-  const quickStock = (delta: number) => {
-    const next = Math.max(0, product.current_stock + delta);
-    if (next === product.current_stock) return;
-    updateProduct.mutate({
-      id: product.id,
-      patch: { current_stock: next },
-      stockChangeType: delta < 0 ? "sale" : "restock",
-    });
+  const stock = product.current_stock;
+  const sellingPrice = Number(d.selling_price) || 0;
+  const saleQtyNum = Math.floor(Number(saleQty));
+  const saleValid = saleQtyNum > 0 && saleQtyNum <= stock;
+  const adjustNum = Math.floor(Number(adjustAmount));
+  const adjustDirection =
+    ADJUSTMENT_REASONS.find((r) => r.type === adjustReason)?.direction ?? "add";
+  const adjustValid =
+    adjustAmount !== "" &&
+    !Number.isNaN(adjustNum) &&
+    (adjustDirection === "set"
+      ? adjustNum >= 0 && adjustNum !== stock
+      : adjustDirection === "remove"
+        ? adjustNum > 0 && adjustNum <= stock
+        : adjustNum > 0);
+
+  const recordSale = () => {
+    if (!saleValid) return;
+    const next = stock - saleQtyNum;
+    updateProduct.mutate(
+      { id: product.id, patch: { current_stock: next }, stockChangeType: "sale" },
+      {
+        onSuccess: () =>
+          toast.success(
+            `Sold ${saleQtyNum} ${saleQtyNum === 1 ? "unit" : "units"}` +
+              (sellingPrice > 0
+                ? ` · +${formatCurrency(saleQtyNum * sellingPrice, currency)}`
+                : ""),
+          ),
+      },
+    );
     set("current_stock", String(next));
+    setSaleQty("1");
+  };
+
+  const applyAdjustment = () => {
+    if (!adjustValid) return;
+    const next =
+      adjustDirection === "set"
+        ? adjustNum
+        : adjustDirection === "remove"
+          ? stock - adjustNum
+          : stock + adjustNum;
+    const label =
+      ADJUSTMENT_REASONS.find((r) => r.type === adjustReason)?.label ?? "Adjusted";
+    updateProduct.mutate(
+      {
+        id: product.id,
+        patch: { current_stock: Math.max(0, next) },
+        stockChangeType: adjustReason,
+      },
+      { onSuccess: () => toast.success(`${label} · stock now ${Math.max(0, next)}`) },
+    );
+    set("current_stock", String(Math.max(0, next)));
+    setAdjustAmount("");
   };
 
   const field = "flex flex-col gap-1.5";
@@ -186,34 +240,89 @@ export function ProductDrawer({
             </div>
           </div>
 
-          {/* Quick stock actions */}
-          <div className="flex items-center justify-between rounded-xl border border-border px-3 py-2.5">
-            <div>
-              <p className="text-xs font-medium">Quick stock</p>
-              <p className="text-[11px] text-muted-foreground">
-                Logs a sale or restock in history
-              </p>
+          {/* Record a sale */}
+          <div className="rounded-xl border border-primary/30 bg-primary-soft/40 p-3">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium">Record a sale</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Lowers stock · adds to revenue &amp; units sold
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min={1}
+                  max={stock}
+                  value={saleQty}
+                  onChange={(e) => setSaleQty(e.target.value)}
+                  className="h-8 w-16 text-center"
+                  aria-label="Units sold"
+                />
+                <Button
+                  size="sm"
+                  onClick={recordSale}
+                  disabled={!saleValid || updateProduct.isPending}
+                >
+                  <ShoppingCart /> Sell
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <p className="mt-2 text-[11px] text-subtle">
+              {stock === 0 ? (
+                "Out of stock — nothing to sell."
+              ) : sellingPrice > 0 ? (
+                <>
+                  Sells at {formatCurrency(sellingPrice, currency)} each ·{" "}
+                  {saleValid
+                    ? `adds ${formatCurrency(saleQtyNum * sellingPrice, currency)} to revenue`
+                    : `max ${stock} available`}
+                </>
+              ) : (
+                <span className="text-amber-600 dark:text-amber-400">
+                  Set a selling price to earn revenue from sales.
+                </span>
+              )}
+            </p>
+          </div>
+
+          {/* Adjust stock (non-sale) */}
+          <div className="rounded-xl border border-border p-3">
+            <p className="text-xs font-medium">Adjust stock</p>
+            <p className="text-[11px] text-muted-foreground">
+              Restock, recount or write off — no revenue impact
+            </p>
+            <div className="mt-2.5 flex items-center gap-2">
+              <Select
+                value={adjustReason}
+                onValueChange={(v) => setAdjustReason(v as HistoryType)}
+              >
+                <SelectTrigger className="h-9 w-[132px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ADJUSTMENT_REASONS.map((r) => (
+                    <SelectItem key={r.type} value={r.type}>
+                      {r.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                type="number"
+                min={0}
+                value={adjustAmount}
+                onChange={(e) => setAdjustAmount(e.target.value)}
+                placeholder={adjustDirection === "set" ? "New count" : "Qty"}
+                className="h-9 flex-1"
+                aria-label={adjustDirection === "set" ? "New stock count" : "Quantity"}
+              />
               <Button
                 variant="secondary"
-                size="icon-sm"
-                onClick={() => quickStock(-1)}
-                disabled={product.current_stock === 0}
-                aria-label="Record sale of one unit"
+                onClick={applyAdjustment}
+                disabled={!adjustValid || updateProduct.isPending}
               >
-                <Minus />
-              </Button>
-              <span className="w-8 text-center text-sm font-semibold tabular-nums">
-                {product.current_stock}
-              </span>
-              <Button
-                variant="secondary"
-                size="icon-sm"
-                onClick={() => quickStock(1)}
-                aria-label="Restock one unit"
-              >
-                <Plus />
+                Apply
               </Button>
             </div>
           </div>

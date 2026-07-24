@@ -38,7 +38,11 @@ create table if not exists expenses (
 create table if not exists inventory_history (
   id uuid primary key default gen_random_uuid(),
   product_id uuid not null references products (id) on delete cascade,
-  type text not null check (type in ('sale', 'restock', 'adjustment', 'created')),
+  type text not null check (
+    type in (
+      'sale', 'restock', 'adjustment', 'created', 'defective', 'lost', 'recount'
+    )
+  ),
   quantity_change integer not null,
   unit_price numeric(10, 2) not null default 0,
   unit_cost numeric(10, 2) not null default 0,

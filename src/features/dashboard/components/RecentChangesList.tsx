@@ -1,8 +1,11 @@
 import {
   ArrowDownRight,
   ArrowUpRight,
+  ClipboardCheck,
   History,
+  PackageMinus,
   PackagePlus,
+  PackageX,
   SlidersHorizontal,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -19,6 +22,9 @@ const TYPE_META: Record<
   restock: { label: "Restock", icon: ArrowUpRight, className: "bg-sky-50 text-sky-500 dark:bg-sky-500/10 dark:text-sky-400" },
   adjustment: { label: "Adjusted", icon: SlidersHorizontal, className: "bg-muted text-muted-foreground" },
   created: { label: "Added", icon: PackagePlus, className: "bg-violet-50 text-violet-500 dark:bg-violet-500/10 dark:text-violet-400" },
+  defective: { label: "Defective", icon: PackageX, className: "bg-danger-soft text-danger" },
+  lost: { label: "Lost", icon: PackageMinus, className: "bg-warning-soft text-amber-600 dark:text-amber-400" },
+  recount: { label: "Recount", icon: ClipboardCheck, className: "bg-muted text-muted-foreground" },
 };
 
 export function RecentChangesList({

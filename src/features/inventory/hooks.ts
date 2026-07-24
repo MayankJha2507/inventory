@@ -35,8 +35,9 @@ interface UpdateProductInput {
   id: string;
   patch: ProductPatch;
   /**
-   * How a stock change should be logged in inventory history.
-   * Defaults to inferring: decrease → sale, increase → restock.
+   * How a stock change should be logged in inventory history. Defaults to
+   * "adjustment" — a neutral correction that does NOT affect revenue or units
+   * sold. Sales must be recorded explicitly with stockChangeType: "sale".
    */
   stockChangeType?: HistoryType;
 }
@@ -59,8 +60,7 @@ export function useUpdateProduct() {
         patch.current_stock !== previous.current_stock
       ) {
         const delta = patch.current_stock - previous.current_stock;
-        const type: HistoryType =
-          stockChangeType ?? (delta < 0 ? "sale" : "restock");
+        const type: HistoryType = stockChangeType ?? "adjustment";
         await adapter.recordHistory({
           product_id: id,
           type,

@@ -37,7 +37,22 @@ export interface Expense {
 export type NewExpense = Omit<Expense, "id" | "created_at">;
 export type ExpensePatch = Partial<NewExpense>;
 
-export type HistoryType = "sale" | "restock" | "adjustment" | "created";
+export type HistoryType =
+  | "sale"
+  | "restock"
+  | "adjustment"
+  | "created"
+  | "defective"
+  | "lost"
+  | "recount";
+
+/** Stock changes that reduce inventory without being a sale. */
+export const ADJUSTMENT_REASONS = [
+  { type: "restock", label: "Restock", direction: "add" },
+  { type: "recount", label: "Recount", direction: "set" },
+  { type: "defective", label: "Defective", direction: "remove" },
+  { type: "lost", label: "Lost / other", direction: "remove" },
+] as const;
 
 export interface HistoryEntry {
   id: string;

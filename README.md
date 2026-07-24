@@ -47,10 +47,11 @@ two `VITE_SUPABASE_*` environment variables in Site settings.
 
 - **Inventory value** = cost price × current stock
 - **Profit per unit** = selling price − cost price
-- **Revenue / gross profit** come from the `inventory_history` log: lowering
-  stock records a *sale* (at the current selling price), raising it records a
-  *restock*. Saving from the product drawer logs an *adjustment* instead, and
-  the drawer's quick-stock buttons record explicit sales/restocks.
+- **Revenue / gross profit** come only from *sales* in the `inventory_history`
+  log. Record a sale in the product drawer's **Record a sale** control (units
+  sold × selling price). Every other stock change — editing the stock cell,
+  restock, recount, defective, lost — is a neutral *adjustment*: it changes the
+  count but never affects revenue or units sold.
 - **Net profit** = gross profit − total expenses.
 - Status: **Out of stock** (0), **Low stock** (≤ minimum), **Healthy**.
 
